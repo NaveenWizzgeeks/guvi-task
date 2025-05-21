@@ -2,8 +2,8 @@ FROM php:8.1-apache
 
 RUN apt-get update && apt-get install -y libzip-dev zip unzip libssl-dev && \
     docker-php-ext-install zip mysqli && \
-    pecl install mongodb redis && \
-    docker-php-ext-enable mongodb redis
+    pecl install mongodb-1.15.0 \
+    && docker-php-ext-enable mongodb
 
 RUN a2enmod rewrite
 
