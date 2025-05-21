@@ -1,9 +1,9 @@
 <?php
 
-$host = "host";
-$dbname = "taskdb";
-$username = "user";
-$password = "password";
+$host = "guvi.cz8ugi66ap5w.eu-north-1.rds.amazonaws.com";
+$dbname = "guvi";
+$username = "admin";
+$password = "Admin123";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);

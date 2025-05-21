@@ -41,8 +41,7 @@ a {
 }
 
 .pass-error,
-.user-error,
-.contact-error {
+.user-error {
   color: red;
   position: absolute;
   margin-bottom: 10px;

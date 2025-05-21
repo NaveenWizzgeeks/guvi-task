@@ -1,0 +1,9 @@
+{
+    "require": {
+      "mongodb/mongodb": "^1.15",
+      "predis/predis": "^1.1", 
+      "ext-mongodb": "*", 
+      "ext-redis": "*",  
+      "symfony/polyfill-php80": "^1.32"
+    }
+  }
