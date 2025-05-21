@@ -18,7 +18,7 @@ if (!$username || !$password) {
 }
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO users1 (username, password) VALUES (?, ?)");
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $stmt->execute([$username, $hashedPassword]);
 

@@ -1,59 +1,56 @@
 <?php
-
 header('Content-Type: application/json');
 
 require 'mongo.php';
 require 'redis.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
-$token = $data['token'] ?? null;
-$action = $data['action'] ?? 'get';
+$token = $data['token'] ?? '';
+$action = $data['action'] ?? '';
 
 if (!$token) {
-    echo json_encode(["success" => false, "message" => "Missing session token."]);
+    echo json_encode(["success" => false, "message" => "Token missing"]);
     exit;
 }
 
-$username = $redis->get("session:$token");
+$username = $redis->get("token:$token");
 
 if (!$username) {
-    echo json_encode(["success" => false, "message" => "Invalid or expired session token."]);
+    echo json_encode(["success" => false, "message" => "Token has expired or is invalid."]);
     exit;
 }
 
-try {
-    $usersCollection = $mongoDB->users;
+$collection = $mongoDB->users;
 
-    if ($action === "get") {
-        $profile = $usersCollection->findOne(["username" => $username]);
+if ($action === 'get') {
+    $user = $collection->findOne(["username" => $username]);
 
-        if ($profile) {
-            unset($profile['_id']);
-            echo json_encode(["success" => true, "profile" => $profile]);
-        } else {
-            echo json_encode(["success" => false, "message" => "User profile not found."]);
-        }
-
-    } elseif ($action === "update") {
-        $age = trim($data['age'] ?? '');
-        $dob = trim($data['dob'] ?? '');
-        $contact = trim($data['contact'] ?? '');
-
-        $updateResult = $usersCollection->updateOne(
-            ["username" => $username],
-            ['$set' => [
-                "age" => $age,
-                "dob" => $dob,
-                "contact" => $contact
-            ]]
-        );
-
-        echo json_encode(["success" => true, "message" => "Profile updated successfully."]);
+    if ($user) {
+        echo json_encode([
+            "success" => true,
+            "profile" => [
+                "username" => $user['username'],
+                "age" => $user['age'] ?? '',
+                "dob" => $user['dob'] ?? '',
+                "contact" => $user['contact'] ?? ''
+            ]
+        ]);
     } else {
-        echo json_encode(["success" => false, "message" => "Invalid action."]);
+        echo json_encode(["success" => false, "message" => "User not found."]);
     }
+} elseif ($action === 'update') {
+    $updateFields = [];
 
-} catch (Exception $e) {
-    echo json_encode(["success" => false, "message" => "MongoDB error: " . $e->getMessage()]);
+    if (!empty($data['age'])) $updateFields['age'] = $data['age'];
+    if (!empty($data['dob'])) $updateFields['dob'] = $data['dob'];
+    if (!empty($data['contact'])) $updateFields['contact'] = $data['contact'];
+
+    $collection->updateOne(
+        ['username' => $username],
+        ['$set' => $updateFields]
+    );
+
+    echo json_encode(["success" => true, "message" => "Profile updated successfully."]);
+} else {
+    echo json_encode(["success" => false, "message" => "Invalid action."]);
 }
-?>
