@@ -2,8 +2,16 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$mongoURI = "mongodb+srv://naveenkumar:medsy@medsy.vu7dt.mongodb.net/";
-$databaseName = "taskdb";
+use Dotenv\Dotenv;
+
+
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+
+$mongoURI = $_ENV['MONGO_DB_URI'];
+$databaseName = $_ENV['MONGO_DB_NAME'];
+
 
 try {
     $client = new MongoDB\Client($mongoURI);
